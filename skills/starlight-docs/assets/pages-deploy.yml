@@ -1,0 +1,49 @@
+# .github/workflows/pages-deploy.yml
+# Build the Starlight site and deploy to GitHub Pages. Adjust `path:` + paths filter to the
+# docs dir, and `node-version`/`package-manager` to your toolchain.
+#
+# Prereqs:
+#   - Repo is public (or Pages enabled for private on a paid plan).
+#   - Enable Pages with the Actions source: `gh api -X POST repos/<owner>/<repo>/pages -f build_type=workflow`
+#   - astro.config has `site` + `base` set for the project sub-path (see SKILL.md Phase 6).
+name: Deploy docs to Pages
+
+on:
+  push:
+    branches: [main]
+    paths: ['docs-site/**', '.github/workflows/pages-deploy.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build with Astro
+        uses: withastro/action@v3
+        with:
+          path: ./docs-site
+          # Pin Node + pnpm: pnpm@latest (v11) needs Node >=22.13 but the action defaults to
+          # Node 20 → build fails. Match the committed lockfile's pnpm version.
+          node-version: 22
+          package-manager: pnpm@10.27.0
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

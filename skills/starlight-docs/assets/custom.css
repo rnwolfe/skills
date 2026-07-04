@@ -1,0 +1,29 @@
+/* docs/src/styles/custom.css — design-token starter.
+   Override Starlight CSS custom properties; do NOT fork the theme.
+   Pick a brand accent ramp (low/base/high). Starlight derives links/hovers from it. */
+
+/* Self-hosted fonts (free, no CDN). Install:
+   pnpm add @fontsource-variable/inter @fontsource-variable/jetbrains-mono */
+@import '@fontsource-variable/inter';
+@import '@fontsource-variable/jetbrains-mono';
+
+:root {
+  /* --- Brand accent ramp (EDIT to your brand) --- */
+  --sl-color-accent-low: #1a2e1a;
+  --sl-color-accent: #2f9e44;
+  --sl-color-accent-high: #8ce99a;
+
+  /* --- Typography --- */
+  --sl-font: 'Inter Variable', system-ui, sans-serif;
+  --sl-font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+
+  /* --- Reading layout --- */
+  --sl-content-width: 50rem; /* roomier reading column */
+  --sl-text-5xl: 3.5rem;     /* bigger page titles */
+}
+
+/* Light-mode-only overrides go here */
+:root[data-theme='light'] {
+  /* e.g. soften the accent for light backgrounds
+  --sl-color-accent: #2b8a3e; */
+}

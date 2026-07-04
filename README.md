@@ -35,3 +35,22 @@ shape, description-as-trigger discipline, keeping the body lean). New skills are
 scaffolded from a [Heimdall](https://github.com/rnwolfe/factory) Watch insight — a recurring
 ritual the system noticed and proposed generalizing — but a hand-written `SKILL.md` that
 follows the layout above is equally valid.
+
+## Companion skills (from other registries)
+
+This registry contains only skills authored here. Some skills I use every day live in
+**other** registries — installing them from *their* source keeps attribution and upstream
+updates intact, rather than vendoring copies here. If you want the full set I run, add these
+too:
+
+- **Video / motion** — [`heygen-com/hyperframes`](https://github.com/heygen-com/hyperframes):
+  `hyperframes` (+ siblings), `general-video`, `motion-graphics`, `music-to-video`,
+  `website-to-video`, `faceless-explainer`, `embedded-captions`, `talking-head-recut`, and more.
+- **Skill discovery** — [`vercel-labs/skills`](https://github.com/vercel-labs/skills): `find-skills`.
+- **Image generation** — [`gargantuax/openskills`](https://github.com/gargantuax/openskills): `nanobanana`.
+
+```sh
+npx skills add heygen-com/hyperframes
+npx skills add vercel-labs/skills --skill find-skills
+npx skills add gargantuax/openskills --skill nanobanana
+```

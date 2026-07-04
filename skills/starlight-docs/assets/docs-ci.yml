@@ -1,0 +1,37 @@
+# .github/workflows/docs.yml
+# Build gate: docs must compile, type-check, and have no dead links before merge.
+# Adjust paths/filters to the chosen docs dir (here: docs/).
+name: docs
+
+on:
+  pull_request:
+    paths: ['docs/**']
+  push:
+    branches: [main]
+    paths: ['docs/**']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # full history so Starlight `lastUpdated` git dates are correct
+
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # Type/content validation (catches bad frontmatter, broken slugs).
+      - run: pnpm --filter docs exec astro check
+
+      # Static build — fails on MDX errors and produces dist/ + llms*.txt.
+      - run: pnpm --filter docs build
+
+      # External link rot (static, no service needed). Non-blocking by default;
+      # drop `|| true` to make broken external links fail the build.
+      - run: pnpm dlx lychee 'docs/dist/**/*.html' --no-progress || true
