@@ -9,12 +9,16 @@ description: >-
   docs-as-code workflow. Inspects the repo first (package manager, monorepo
   layout, existing docs, CI, agent files), decides non-bloating placement,
   applies design tokens, sets up easy LAN/self-host serving, and adds a docs
-  freshness directive to the agent file.
+  freshness directive to the agent file. Builds the docs *shell* (site, tokens,
+  llms.txt, CI, freshness wiring) with stub pages; pair it with the `harvest-docs`
+  skill to populate the pages with comprehensive, code-accurate content.
 ---
 
 # starlight-docs
 
 Set up a free, self-hosted **Astro Starlight** documentation site that is well-integrated, visually distinctive, AI-readable (`llms.txt`), and kept up to date by a directive baked into the repo's agent file. Always **inspect before scaffolding** — placement and config depend on what the repo already is.
+
+**Scope — this skill builds the *shell*, not the content.** It scaffolds the site, tokens, `llms.txt`, CI gate, and the freshness directive, and leaves **stub pages**. Writing the comprehensive, code-accurate doc set is a separate job: the **`harvest-docs`** skill (multi-agent scavenge → per-page writers-from-source → per-section review). Don't hand-author the full doc set here — scaffold, then hand off to `harvest-docs` (Phase 8).
 
 Assumed environment (this operator): Linux + zsh, mise-managed Node, `pnpm` default, self-host via Caddy + the `expose` CLI, dev servers bound to `0.0.0.0`. Detect and adapt if the repo says otherwise (npm/yarn/bun lockfile, Vercel/Netlify config, etc.).
 
@@ -156,6 +160,8 @@ A project Pages site lives at `https://<owner>.github.io/<repo>/` — a **sub-pa
 
 This is the durable half. Find the repo's agent file(s) from Phase 1 and **append** the docs-freshness directive from `assets/agent-directive.md` (fill in the real docs path and dev/build commands). Priority order if multiple exist — update the one the repo's tooling actually reads; if several are active (e.g. both `CLAUDE.md` and `AGENTS.md`), add a short pointer in each to the canonical one rather than duplicating.
 
+> If `harvest-docs` runs later, it appends a near-identical (slightly stronger, release-drift-aware) directive and is written to *strengthen an existing one rather than duplicate it* — so a double-append is expected to reconcile, not error. Don't pre-empt it; just install this directive now.
+
 If NO agent file exists, create `AGENTS.md` (broadest compatibility) at repo root containing the directive, or ask the user which file their tooling uses.
 
 The directive must make these obligations concrete (not vague "keep docs updated"):
@@ -176,7 +182,14 @@ Edit the file directly, then show the user the diff.
 - `.gitignore` excludes docs build output.
 - Agent file contains the freshness directive (show the appended block).
 
-Report: placement chosen + why, what was scaffolded, the serving command, and the exact agent-file edit. Offer to `expose` it and to write a first real docs page from the project's README.
+Report: placement chosen + why, what was scaffolded, the serving command, and the exact agent-file edit. Offer to `expose` it.
+
+**Then hand off — this is the point of the scaffold.** The site currently has **stub pages**. To
+populate it with a comprehensive, code-accurate doc set, run the **`harvest-docs`** skill (it does
+the deep scavenge → IA sign-off → one-writer-per-page-from-source → per-section review → build-verify
+against the same site you just built). Don't hand-write the full doc set here — at most seed a single
+Quickstart page from the README to prove the pipeline, and point the user at `harvest-docs` for the
+rest. If the user only wanted the scaffold, stop here and name `harvest-docs` as the next step.
 
 ---
 
